@@ -15,6 +15,10 @@ description: Current Ethereum development tools, frameworks, libraries, RPCs, an
 
 **Foundry and Hardhat 3 are both legitimate choices in 2026.** Foundry: faster, Solidity-native. Hardhat 3: TypeScript-first, mature plugin ecosystem.
 
+**Token price data can be fetched directly from the RPC:** `eth-prices` (TS/Rust) routes Uniswap V2/V3, Chainlink, ERC-4626, and ECB quotes over plain RPC, pins them to a block, and quotes any asset against any other — so the user's display currency is a parameter, not a hardcoded USD. A CoinGecko key is optional, not required.
+
+**Icons and avatars have no single source:** `eth-icons` (TS/Rust) queries five logo registries in parallel; `eth-avatars` (TS/Rust) decodes `ipfs://`, `ar://`, and `eip155:` avatar records that never render in `<img src>`; `blo` (TS) draws a deterministic identicon for any address.
+
 ## Tool Discovery Pattern for AI Agents
 
 When an agent needs to interact with Ethereum:
@@ -74,6 +78,30 @@ const response = await x402Fetch('https://api.example.com/data', {
 - **UI Components:** https://ui.scaffoldeth.io/
 - **Docs:** https://docs.scaffoldeth.io/
 
+## Prices: Fetch Price Data Directly From the RPC
+
+The pools and feeds are already onchain, so token price data can be read straight from the RPC you are connected to. That is the best option available today: no key, no rate limit, and a number you can reproduce.
+
+**`eth-prices`** (TS/Rust) — https://github.com/v3xlabs/eth-prices
+
+Builds a route graph over Uniswap V2/V3 pools, ERC-4626 vaults, Chainlink feeds, fixed pegs (WETH→ETH, USDC→USD), and ECB fiat rates, then quotes any asset against any other at a pinned block — token to token, token to fiat, fiat to token. Your display currency is a routing target, not a hardcoded USD assumption. The block number makes the answer reproducible, which a CoinGecko response never is. Its autorouter discovers the pools and vaults for a token set when you do not know the addresses.
+
+## Icons and Avatars
+
+Neither token iconography nor avatar hosting is part of any standard, so agents hardcode a CDN path or drop a non-https URI into `<img src>` and ship a broken image.
+
+**`eth-icons`** (TS/Rust) — https://github.com/v3xlabs/eth-icons
+
+Network, native asset, and ERC-20 logos from Avara, Blockscout, SafeWallet, Smoldapp, and Zerion, queried in parallel. Per source you get `found`, `not-found`, `unsupported`, or `failed`, so one dead source cannot blank your token list.
+
+**`eth-avatars`** (TS/Rust) — https://github.com/v3xlabs/eth-avatars
+
+An ENS `avatar` record is frequently `ipfs://`, `ar://`, `bzz://`, or `eip155:1/erc721:0x…/1234`. This decodes the URI into a resource you can fetch, cache, or store — including walking NFT metadata for the `eip155:` form — over IPFS, Swarm, and Arweave gateways.
+
+**`blo`** (TS) — https://github.com/bpierre/blo
+
+Deterministic identicon for any address, no network call. Use it as the fallback wherever an address has no avatar.
+
 ## Choosing Your Stack (2026)
 
 | Need | Tool |
@@ -84,6 +112,10 @@ const response = await x402Fetch('https://api.example.com/data', {
 | React frontends | **wagmi + viem** (or SE2 which wraps these) |
 | Agent blockchain reads | **Blockscout MCP** |
 | Agent payments | **x402 SDKs** |
+| Token prices from RPC | **eth-prices** |
+| Token and network icons | **eth-icons** |
+| ENS avatar URI resolution | **eth-avatars** |
+| Identicon for any address | **blo** |
 
 ## Essential Foundry cast Commands
 
