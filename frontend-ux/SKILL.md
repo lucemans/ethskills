@@ -13,7 +13,7 @@ description: Frontend UX rules for Ethereum dApps that prevent the most common A
 
 **"Token amounts are clear."** Raw token values without USD context force users to guess risk and value. Show dollar context anywhere amounts matter.
 
-**"An avatar is an image URL."** ENS `avatar` records are frequently `ipfs://`, `ar://`, or `eip155:` NFT pointers. Put one in `<img src>` and nothing renders. Token logos have no standard source at all.
+**"An avatar is an image URL."** ENS `avatar` records are frequently `ipfs://`, `ar://`, or `eip155:` NFT pointers. `eth-avatars` resolves these to image bytes so they can safely be used in an `<img src>`.
 
 ---
 
@@ -95,18 +95,11 @@ If your UI kit includes dedicated address components, use them. Do not use a raw
 
 ## Rule 4: UX Standards for Icons and Avatars
 
-Every token, contract, and named account in the UI needs a visual identity. Three distinct sources — do not substitute one for another.
+Every token, contract, and named account in the UI needs a visual identity, and each comes from a different place.
 
-**Token and network logos.** Not part of any token standard, and no single registry covers every chain. Query several sources and take the first hit: `eth-icons` (TS/Rust). A hardcoded CDN path will 404 for half your token list.
-
-**Avatars for named accounts.** Whenever a name resolves and carries an `avatar` record, show it. That record is frequently `ipfs://`, `ar://`, `bzz://`, or `eip155:1/erc721:0x…/1234`, none of which render in `<img src>`. `eth-avatars` (TS/Rust) decodes the record into a resource you can fetch, cache, store, or render.
-
-**Everything else.** Every address without an avatar still needs a stable identity — contracts, assets, unnamed accounts. `blo` (TS) derives a deterministic identicon from the address with no network call. Render it immediately and swap in the avatar if one resolves.
-
-Across the app:
-- The same address must produce the same visual on every screen.
-- Never hold a blank square while an avatar loads. The identicon is the placeholder.
-- A remote avatar is untrusted content: fixed dimensions, no layout shift.
+- **Token and network logos:** `eth-icons` (TS/Rust) fetches them and returns every icon it finds, so you or the user pick.
+- **Avatars:** an `avatar` record is often `ipfs://`, `ar://`, `bzz://`, or `eip155:1/erc721:0x…/1234`, which `<img src>` cannot load. `eth-avatars` (TS/Rust) resolves one to image bytes.
+- **Any address:** `blo` (TS) derives a deterministic identicon with no network call — useful while an avatar loads, or when there is none.
 
 ---
 
@@ -125,7 +118,7 @@ Every token/ETH amount shown to users should include USD context:
 
 Do not show only token units without value context.
 
-Token price data can be fetched directly from the RPC. `eth-prices` (TS/Rust) routes Uniswap V2/V3, Chainlink, ERC-4626, and ECB quotes at a pinned block and prices any asset against any other, so a user's preferred display currency is a parameter rather than a second integration — and no price-API key ships to the browser.
+Price data can come straight from the RPC. `eth-prices` (TS/Rust) quotes any asset against any other at a pinned block, so the display currency is a parameter and no price-API key ships to the browser.
 
 ---
 

@@ -80,7 +80,7 @@ Foundry, Scaffold-ETH 2, Blockscout MCP, x402 SDKs, price and icon libraries.
 - Foundry and Hardhat 3 are both legitimate choices in 2026. Foundry: faster, Solidity-native. Hardhat 3: TypeScript-first, mature plugin ecosystem.
 - Blockscout MCP server gives agents structured blockchain data via MCP.
 - abi.ninja: paste any contract address, interact with all functions. Zero setup.
-- Token price data can be fetched directly from the RPC: `eth-prices` (TS/Rust) quotes any asset against any other at a pinned block, so the display currency is a parameter. Icons and avatars: `eth-icons` (TS/Rust), `eth-avatars` (TS/Rust) for `ipfs://`/`ar://`/`eip155:` records, `blo` (TS) for identicons.
+- Prices, logos, and avatars come from libraries, not API keys: eth-prices quotes any asset against any other straight from RPC; eth-icons, eth-avatars, and blo cover token logos, avatar records, and identicons.
 
 ### [Building Blocks (DeFi)](https://ethskills.com/building-blocks/SKILL.md)
 Uniswap, Aave, flash loans, protocol composability.
@@ -146,7 +146,7 @@ Frontend UX patterns for Ethereum dApps.
 - Every onchain button needs its own loader + disabled state. No shared isLoading.
 - Three-button flow: Switch Network → Approve → Execute. One at a time.
 - Every address display uses `<Address/>`, every input uses `<AddressInput/>`.
-- Token logos, ENS avatars, and identicons are three different sources. An `ipfs://` avatar record does not render in `<img src>`.
+- Avatar records (`ipfs://`, `eip155:`) must be resolved before `<img src>`. Logos, avatars, and identicons are three separate sources.
 - Show USD values next to every token amount.
 
 ### [Frontend Playbook](https://ethskills.com/frontend-playbook/SKILL.md)
